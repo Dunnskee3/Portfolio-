@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUNNSKEE3 // Tech Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#030306;--surface:#07070f;--surface2:#0b0b17;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --accent:#00f5c0;--accent-dim:rgba(0,245,192,0.1);--accent-glow:rgba(0,245,192,0.25);
+  --amber:#ffaa00;--amber-dim:rgba(255,170,0,0.1);
+  --red:#ff2244;--red-dim:rgba(255,34,68,0.1);
+  --blue:#4488ff;--blue-dim:rgba(68,136,255,0.1);
+  --purple:#aa44ff;--purple-dim:rgba(170,68,255,0.1);
+  --text:#c8c8e0;--text-dim:#50507a;--text-bright:#f0f0ff;
+  --ff-display:'Orbitron',monospace;
+  --ff-body:'Rajdhani',sans-serif;
+  --ff-mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--ff-body);min-height:100vh;overflow-x:hidden;cursor:crosshair}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,245,192,0.3)}
+
+/* GATE */
+#gate{position:fixed;inset:0;z-index:9500;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;transition:opacity 0.7s ease,visibility 0.7s ease}
+#gate.unlocking{opacity:0;visibility:hidden}
+#gate.gone{display:none}
+.gate-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0}
+.gate-eyebrow{font-family:var(--ff-mono);font-size:0.6rem;letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;margin-bottom:2rem;display:flex;align-items:center;gap:0.75rem}
+.gate-eyebrow::before,.gate-eyebrow::after{content:'';flex:1;height:1px;width:60px;background:var(--border2)}
+.gate-logo{font-family:var(--ff-display);font-size:clamp(2.5rem,8vw,5rem);font-weight:900;color:var(--text-bright);letter-spacing:0.06em;line-height:1;margin-bottom:0.5rem}
+.gate-logo span{color:var(--accent)}
+.gate-sub{font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:3rem}
+.gate-box{border:1px solid var(--border2);padding:2.5rem 3rem;background:var(--surface);display:flex;flex-direction:column;align-items:center;gap:1.25rem;min-width:340px;position:relative}
+.gate-box::before{content:'⬛ RESTRICTED ACCESS';position:absolute;top:-0.55rem;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 0.75rem;font-family:var(--ff-mono);font-size:0.58rem;letter-spacing:0.25em;color:var(--red);white-space:nowrap}
+.gate-label{font-family:var(--ff-mono);font-size:0.62rem;letter-spacing:0.2em;color:var(--text-dim);text-transform:uppercase;align-self:flex-start}
+.gate-input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text-bright);font-family:var(--ff-mono);font-size:1rem;letter-spacing:0.3em;padding:0.75rem 1rem;text-align:center;text-transform:uppercase;outline:none;transition:border-color 0.2s}
+.gate-input:focus{border-color:var(--accent)}
+.gate-input.err{border-color:var(--red);animation:shake 0.4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gate-btn{width:100%;font-family:var(--ff-mono);font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.85rem;background:transparent;border:1px solid var(--accent);color:var(--accent);cursor:pointer;transition:all 0.2s}
+.gate-btn:hover{background:var(--accent);color:var(--bg)}
+.gate-err{font-family:var(--ff-mono);font-size:0.62rem;letter-spacing:0.15em;color:var(--red);text-transform:uppercase;height:1rem;transition:opacity 0.2s}
+.gate-err.hide{opacity:0}
+.gate-hint{font-family:var(--ff-mono);font-size:0.55rem;color:var(--text-dim);letter-spacing:0.15em;margin-top:2rem}
+.gate-hint a{color:var(--accent);text-decoration:none}
+/* Gate canvas */
+#gate-canvas{position:absolute;inset:0;z-index:0;opacity:0.4;pointer-events:none}
+/* Modal inner scroll fix */
+.m-walk{padding:2rem 2rem 1.5rem;overflow-y:auto}
+/* CANVAS */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* SCANLINE */
+.scanline{position:fixed;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);z-index:9999;opacity:0.12;animation:scanDown 10s linear infinite;pointer-events:none}
+@keyframes scanDown{0%{top:-2px}100%{top:100vh}}
+
+/* WRAPPER */
+.wrap{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:0 2.5rem}
+
+/* HEADER */
+header{padding:2.5rem 0 2rem;border-bottom:1px solid var(--border);position:relative}
+header::after{content:'';position:absolute;bottom:-1px;left:0;width:200px;height:1px;background:linear-gradient(90deg,var(--accent),transparent)}
+.header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.logo{font-family:var(--ff-display);font-weight:900;font-size:clamp(1.8rem,4vw,3rem);color:var(--text-bright);letter-spacing:0.06em;line-height:1}
+.logo span{color:var(--accent)}
+.logo-sub{font-family:var(--ff-mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.25em;margin-top:0.4rem}
+.header-right{text-align:right}
+.header-tag{font-family:var(--ff-mono);font-size:0.65rem;color:var(--accent);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:0.35rem}
+.header-desc{font-size:0.9rem;color:var(--text-dim);font-weight:300;letter-spacing:0.05em}
+.live-indicator{display:inline-flex;align-items:center;gap:0.4rem;font-family:var(--ff-mono);font-size:0.6rem;letter-spacing:0.2em;color:var(--accent);margin-top:0.4rem}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse-dot 1.5s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.6)}}
+
+/* STATS */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
+@media(max-width:640px){.stats-bar{grid-template-columns:repeat(2,1fr)}}
+.stat{padding:1.5rem 2rem;border-right:1px solid var(--border);position:relative;overflow:hidden}
+.stat:last-child{border-right:none}
+.stat::before{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--accent);transition:width 0.6s ease}
+.stat:hover::before{width:100%}
+.stat-n{font-family:var(--ff-display);font-size:2rem;font-weight:700;color:var(--accent);display:block;line-height:1}
+.stat-l{font-family:var(--ff-mono);font-size:0.6rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:0.3rem}
+
+/* FILTERS */
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:2rem 0 1.5rem;flex-wrap:wrap;gap:1rem}
+.section-label{font-family:var(--ff-mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.25em;text-transform:uppercase}
+.filters{display:flex;gap:0.4rem;flex-wrap:wrap}
+.f-btn{padding:0.35rem 1rem;background:transparent;border:1px solid var(--border2);color:var(--text-dim);font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;transition:all 0.2s}
+.f-btn:hover,.f-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:1.25rem;padding-bottom:4rem}
+@media(max-width:480px){.grid{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;opacity:0;transform:translateY(14px);transition:opacity 0.45s ease,transform 0.45s ease,border-color 0.25s,box-shadow 0.25s}
+.card.show{opacity:1;transform:translateY(0)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ca,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease}
+.card:hover{border-color:var(--ca,var(--accent));transform:translateY(-3px) !important;box-shadow:0 0 40px rgba(0,0,0,0.4),0 0 0 1px rgba(0,245,192,0.04)}
+.card:hover::before{transform:scaleX(1)}
+
+.card-head{padding:1.25rem 1.25rem 0.75rem;display:flex;align-items:flex-start;justify-content:space-between}
+.cat-badge{font-family:var(--ff-mono);font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.2rem 0.65rem;border:1px solid var(--ca,var(--accent));color:var(--ca,var(--accent))}
+.status-badge{font-family:var(--ff-mono);font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;display:flex;align-items:center;gap:0.35rem;color:var(--ca,var(--accent))}
+.s-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse-dot 2s infinite}
+
+/* THUMBNAIL */
+.thumb{margin:0 1.25rem;height:156px;overflow:hidden;border:1px solid var(--border);position:relative;background:var(--surface2)}
+.thumb svg{width:100%;height:100%;display:block}
+.thumb-lock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,3,9,0.6);opacity:0;transition:opacity 0.2s}
+.card:hover .thumb-lock{opacity:1}
+.lock-icon{font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--ca,var(--accent));border:1px solid var(--ca,var(--accent));padding:0.35rem 1rem;text-transform:uppercase}
+
+.card-body{padding:1.1rem 1.25rem;flex:1}
+.card-title{font-family:var(--ff-display);font-size:0.95rem;font-weight:600;color:var(--text-bright);letter-spacing:0.04em;margin-bottom:0.6rem;line-height:1.3}
+.card-desc{font-size:0.88rem;color:var(--text-dim);line-height:1.65;font-weight:400}
+.tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.9rem}
+.tag{font-family:var(--ff-mono);font-size:0.56rem;padding:0.18rem 0.5rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase}
+
+.card-foot{padding:0.9rem 1.25rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.class-label{font-family:var(--ff-mono);font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase}
+.cl-r{color:var(--red)}.cl-c{color:var(--amber)}.cl-o{color:var(--accent)}
+.view-btn{font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1.1rem;background:transparent;border:1px solid var(--ca,var(--accent));color:var(--ca,var(--accent));transition:all 0.2s}
+.view-btn:hover{background:var(--ca,var(--accent));color:var(--bg)}
+
+/* MODAL */
+#overlay{position:fixed;inset:0;z-index:2000;background:rgba(3,3,6,0.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s}
+#overlay.open{opacity:1;visibility:visible}
+.modal{background:var(--surface);border:1px solid var(--border2);width:100%;max-width:920px;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(18px);transition:transform 0.3s}
+#overlay.open .modal{transform:translateY(0)}
+
+.m-close{position:absolute;top:1rem;right:1rem;z-index:10;width:32px;height:32px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--text-dim);font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.m-close:hover{border-color:var(--red);color:var(--red)}
+
+.m-bar{padding:0.65rem 1.5rem;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap}
+.m-bar-item{font-family:var(--ff-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase}
+.m-bar-item span:first-child{color:var(--text-dim);margin-right:0.4rem}
+.m-bar-item span:last-child{color:var(--text-bright)}
+.m-bar-item.ml{margin-left:auto}
+
+.m-preview{position:relative;height:300px;overflow:hidden;background:var(--bg);border-bottom:1px solid var(--border)}
+.m-preview-inner{width:100%;height:100%;filter:blur(14px);transform:scale(1.06);pointer-events:none}
+.m-preview-inner svg{width:100%;height:100%;display:block}
+.m-overlay{position:absolute;inset:0;background:rgba(3,3,6,0.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;z-index:5}
+.m-badge{font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;border:1px solid;padding:0.35rem 1.2rem}
+.m-badge-r{border-color:var(--red);color:var(--red)}
+.m-badge-c{border-color:var(--amber);color:var(--amber)}
+.m-badge-o{border-color:var(--accent);color:var(--accent)}
+.m-preview-label{font-family:var(--ff-mono);font-size:0.58rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase}
+.m-preview-credit{font-family:var(--ff-mono);font-size:0.55rem;color:rgba(255,255,255,0.25);letter-spacing:0.15em}
+
+.m-walk{padding:2rem 2rem 1.5rem}
+.m-dots{display:flex;gap:0.4rem;margin-bottom:1.75rem}
+.m-dot{width:28px;height:2px;border:none;padding:0;background:var(--border2);cursor:pointer;transition:all 0.2s}
+.m-dot.active{background:var(--accent)}
+.m-dot:hover{background:rgba(0,245,192,0.5)}
+
+.m-step{display:flex;align-items:flex-start;gap:1.5rem;margin-bottom:1.25rem}
+.m-icon{font-size:2.2rem;color:var(--accent);line-height:1;min-width:2.2rem}
+.m-meta{}
+.m-counter{font-family:var(--ff-mono);font-size:0.6rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.25rem}
+.m-title{font-family:var(--ff-display);font-size:1.15rem;color:var(--text-bright);letter-spacing:0.04em}
+.m-content{font-size:0.97rem;color:var(--text);line-height:1.82;font-weight:400;max-width:680px}
+
+.m-nav{padding:1.25rem 2rem;border-top:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.m-tech{display:flex;flex-wrap:wrap;gap:0.3rem}
+.m-btns{display:flex;gap:0.6rem}
+.nav-btn{font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.5rem 1.2rem;background:transparent;border:1px solid;transition:all 0.2s}
+.nb-prev{border-color:var(--border2);color:var(--text-dim)}
+.nb-prev:hover:not(:disabled){border-color:var(--text);color:var(--text)}
+.nb-prev:disabled{opacity:0.25;cursor:default}
+.nb-next{border-color:var(--accent);color:var(--accent)}
+.nb-next:hover{background:var(--accent);color:var(--bg)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:3.5rem 0 2.5rem}
+.footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+@media(max-width:700px){.footer-grid{grid-template-columns:1fr}}
+.foot-title{font-family:var(--ff-mono);font-size:0.62rem;letter-spacing:0.25em;color:var(--accent);text-transform:uppercase;margin-bottom:1.25rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem}
+.foot-title::before{content:'//'}
+.deploy-steps{display:flex;flex-direction:column;gap:0.75rem}
+.d-step{display:flex;gap:1rem;padding:0.85rem;background:var(--surface2);border-left:2px solid var(--accent)}
+.d-num{font-family:var(--ff-display);font-size:1.1rem;color:var(--accent);min-width:1.5rem;line-height:1.1}
+.d-text{font-size:0.88rem;color:var(--text-dim);line-height:1.55}
+.d-text strong{color:var(--text);font-weight:600;display:block;margin-bottom:0.2rem}
+.code-block{background:var(--bg);border:1px solid var(--border);padding:1.25rem;overflow-x:auto}
+.code-block pre{font-family:var(--ff-mono);font-size:0.72rem;color:var(--accent);line-height:1.7;white-space:pre}
+.foot-copy{margin-top:3rem;text-align:center;font-family:var(--ff-mono);font-size:0.6rem;color:var(--text-dim);letter-spacing:0.2em;border-top:1px solid var(--border);padding-top:1.5rem}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH GATE ───────────────────────────────────────── -->
+<div id="gate">
+  <canvas id="gate-canvas"></canvas>
+  <div class="gate-wrap">
+    <div class="gate-eyebrow">Transcendent App Development LLC</div>
+    <div class="gate-logo">DUNNSKEE3<span>//</span></div>
+    <div class="gate-sub">Technical Portfolio — Clearance Required</div>
+    <div class="gate-box">
+      <div class="gate-label">// Enter Access Code</div>
+      <input class="gate-input" id="gate-input" type="password" placeholder="••••••••••••" maxlength="32" autocomplete="off" spellcheck="false">
+      <button class="gate-btn" id="gate-btn">AUTHENTICATE →</button>
+      <div class="gate-err hide" id="gate-err">⬛ INVALID CREDENTIALS — ACCESS DENIED</div>
+    </div>
+    <div class="gate-hint">Employer access? Contact via <a href="mailto:hello@transcendentapps.com">hello@transcendentapps.com</a></div>
+  </div>
+</div>
+
+<div class="scanline"></div>
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="logo">DUNNSKEE3<span> //</span></div>
+      <div class="logo-sub">TRANSCENDENT APP DEVELOPMENT LLC — BUILD LOG</div>
+    </div>
+    <div class="header-right">
+      <div class="header-tag">◈ Portfolio — Technical Showcase</div>
+      <div class="header-desc">Full-Stack · AI Systems · Security · Analytics · Automation</div>
+      <div class="live-indicator"><span class="live-dot"></span>ALL SYSTEMS OPERATIONAL</div>
+    </div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><span class="stat-n">08</span><span class="stat-l">Projects Documented</span></div>
+  <div class="stat"><span class="stat-n">20+</span><span class="stat-l">Technologies</span></div>
+  <div class="stat"><span class="stat-n">04</span><span class="stat-l">Live Deployments</span></div>
+  <div class="stat"><span class="stat-n">4</span><span class="stat-l">AI Models Integrated</span></div>
+</div>
+
+<!-- FILTERS -->
+<div class="section-header">
+  <span class="section-label">// Build Registry</span>
+  <div class="filters">
+    <button class="f-btn active" data-f="All" onclick="filter('All',this)">All</button>
+    <button class="f-btn" data-f="AI/ML" onclick="filter('AI/ML',this)">AI / ML</button>
+    <button class="f-btn" data-f="Security" onclick="filter('Security',this)">Security</button>
+    <button class="f-btn" data-f="Analytics" onclick="filter('Analytics',this)">Analytics</button>
+    <button class="f-btn" data-f="Web Dev" onclick="filter('Web Dev',this)">Web Dev</button>
+    <button class="f-btn" data-f="Automation" onclick="filter('Automation',this)">Automation</button>
+    <button class="f-btn" data-f="Client Work" onclick="filter('Client Work',this)">Client Work</button>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="grid" id="grid"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="foot-title">Domain Configuration</div>
+      <div class="deploy-steps">
+        <div class="d-step"><span class="d-num">01</span><div class="d-text"><strong>Register Domain</strong>Recommended registrars: Cloudflare Registrar (no markup), Namecheap, or Google Domains. Suggested: <em>dunnskee3.dev</em> or <em>transcendentapps.com</em></div></div>
+        <div class="d-step"><span class="d-num">02</span><div class="d-text"><strong>Push to GitHub</strong>Create a new repo, commit this <code>index.html</code> to the root, and push to <code>main</code></div></div>
+        <div class="d-step"><span class="d-num">03</span><div class="d-text"><strong>Import to Vercel</strong>vercel.com/new → Import Git Repository → select your repo → Framework: Other → Deploy</div></div>
+        <div class="d-step"><span class="d-num">04</span><div class="d-text"><strong>Connect Domain</strong>Vercel Dashboard → Project → Settings → Domains → Add domain → Update nameservers to Vercel's NS or add a CNAME record pointing to <code>cname.vercel-dns.com</code></div></div>
+        <div class="d-step"><span class="d-num">05</span><div class="d-text"><strong>SSL Auto-Provisioned</strong>Vercel provisions HTTPS via Let's Encrypt automatically. Live globally in 24–48 hours with edge CDN.</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="foot-title">vercel.json Config</div>
+      <div class="code-block"><pre id="vcfg"></pre></div>
+    </div>
+  </div>
+  <div class="foot-copy">© DUNNSKEE3 // TRANSCENDENT APP DEVELOPMENT LLC — ALL BUILDS PROPRIETARY — WALKTHROUGHS FOR DEMONSTRATION ONLY</div>
+</footer>
+
+</div><!-- /wrap -->
+
+<!-- MODAL -->
+<div id="overlay" onclick="handleOvClick(event)">
+  <div class="modal" id="modal">
+    <button class="m-close" onclick="close_()">✕</button>
+    <div class="m-bar">
+      <div class="m-bar-item"><span>PROJECT //</span><span id="m-title">—</span></div>
+      <div class="m-bar-item"><span>ACCESS //</span><span id="m-class">—</span></div>
+      <div class="m-bar-item ml"><span>AUTHOR //</span><span>DUNNSKEE3</span></div>
+    </div>
+    <div class="m-preview">
+      <div class="m-preview-inner" id="m-preview-inner"></div>
+      <div class="m-overlay">
+        <div class="m-badge" id="m-badge">⬛ ACCESS RESTRICTED</div>
+        <div class="m-preview-label">WALKTHROUGH MODE — API CALLS DISABLED — DEMO ONLY</div>
+        <div class="m-preview-credit">BUILT BY DUNNSKEE3 // TRANSCENDENT APP DEVELOPMENT LLC</div>
+      </div>
+    </div>
+    <div class="m-walk">
+      <div class="m-dots" id="m-dots"></div>
+      <div class="m-step">
+        <div class="m-icon" id="m-icon">◈</div>
+        <div class="m-meta">
+          <div class="m-counter" id="m-counter">STEP 01 OF 05</div>
+          <div class="m-title" id="m-stitle">Overview</div>
+        </div>
+      </div>
+      <div class="m-content" id="m-content">Loading...</div>
+    </div>
+    <div class="m-nav">
+      <div class="m-tech" id="m-tech"></div>
+      <div class="m-btns">
+        <button class="nav-btn nb-prev" id="nb-prev" onclick="prev_()">← PREV</button>
+        <button class="nav-btn nb-next" id="nb-next" onclick="next_()">NEXT →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── THUMBNAILS ─────────────────────────────────────────── */
+function svgLgcy(a){return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+<rect width="360" height="156" fill="#050508"/>
+<rect width="65" height="156" fill="#080810"/>
+<text x="8" y="15" font-family="monospace" font-size="7" fill="#fff" font-weight="bold">LGCY</text><text x="30" y="15" font-family="monospace" font-size="7" fill="${a}">AI</text>
+${[25,38,51,64,77,90].map((y,i)=>`<rect x="4" y="${y}" width="57" height="9" fill="${i===0?`rgba(0,245,192,0.12)`:'transparent'}" rx="1"/><rect x="8" y="${y+2.5}" width="4" height="4" fill="${i===0?a:'rgba(255,255,255,0.08)'}" rx="1"/><rect x="16" y="${y+3.5}" width="${[32,28,30,26,24,22][i]}" height="2" fill="${i===0?a:'rgba(255,255,255,0.07)'}" rx="1"/>`).join('')}
+<text x="72" y="18" font-family="monospace" font-size="8" fill="#e0e0f0" font-weight="bold">Command Center</text>
+<rect x="260" y="8" width="92" height="12" fill="rgba(0,245,192,0.1)" stroke="rgba(0,245,192,0.2)" stroke-width=".5" rx="1"/>
+<text x="264" y="17" font-family="monospace" font-size="5.5" fill="${a}">MODEL: CLAUDE SONNET</text>
+${[[72,'2.4K','TOKENS'],[130,'98%','UPTIME'],[188,'14','PHASES'],[246,'4','MODELS']].map(([x,n,l])=>`<rect x="${x}" y="26" width="50" height="26" fill="#0a0a14" stroke="rgba(255,255,255,0.05)" stroke-width=".5"/><text x="${x+6}" y="40" font-family="monospace" font-size="9" fill="${a}" font-weight="bold">${n}</text><text x="${x+6}" y="48" font-family="monospace" font-size="4" fill="#404060">${l}</text>`).join('')}
+<rect x="72" y="60" width="140" height="88" fill="#0a0a14" stroke="rgba(255,255,255,0.04)" stroke-width=".5"/>
+<text x="78" y="72" font-family="monospace" font-size="4.5" fill="#404060">AI PROMPT STUDIO</text>
+<rect x="78" y="76" width="128" height="40" fill="#060609" stroke="rgba(255,255,255,0.03)" stroke-width=".5"/>
+<text x="82" y="89" font-family="monospace" font-size="4" fill="#303050">Generate Q4 campaign for Gen Z</text>
+<text x="82" y="99" font-family="monospace" font-size="4" fill="#252540">targeting luxury streetwear...</text>
+<rect x="78" y="120" width="58" height="14" fill="rgba(0,245,192,0.12)" stroke="rgba(0,245,192,0.25)" stroke-width=".5" rx="1"/>
+<text x="96" y="130" font-family="monospace" font-size="5" fill="${a}" text-anchor="middle">GENERATE</text>
+<rect x="220" y="60" width="132" height="88" fill="#0a0a14" stroke="rgba(255,255,255,0.04)" stroke-width=".5"/>
+<text x="226" y="72" font-family="monospace" font-size="4.5" fill="#404060">SEO INTELLIGENCE</text>
+${['ai branding tool','saas dashboard','content automation','brand intelligence'].map((k,i)=>`<rect x="220" y="${78+i*16}" width="132" height="14" fill="rgba(255,255,255,0.015)"/><text x="226" y="${89+i*16}" font-family="monospace" font-size="4.5" fill="#606080">${k}</text><text x="344" y="${89+i*16}" font-family="monospace" font-size="4.5" fill="${a}" text-anchor="end" font-weight="bold">${['8.2K','5.4K','12K','3.1K'][i]}</text>`).join('')}
+</svg>`}
+
+function svgSecurity(a){const lines=[['> sqlmap -u "http://target.local/login?id=1" --dbs','rgba(255,255,255,0.25)'],['[*] testing connection to the target URL...','rgba(255,255,255,0.15)'],['[CRITICAL] parameter "id" is vulnerable (union-based)','#ff2244'],['[*] fetching database names... available: 3 dbs','rgba(255,255,255,0.15)'],['[WARNING] database: users_prod — 24,891 records found','#ffaa00'],['[*] fetching columns for table: credentials','rgba(255,255,255,0.12)'],['[DATA] column: email, password_hash, api_key, role','rgba(255,255,255,0.12)'],['> python3 remediate.py --parameterize --sanitize all','rgba(255,255,255,0.2)'],['[SUCCESS] parameterized queries applied — injection blocked','#00f5c0'],['[*] running WAF rule validation suite...','rgba(255,255,255,0.12)'],['[SUCCESS] 14/14 attack vectors neutralized','#00f5c0'],['> cvss-score --vector AV:N/AC:L/PR:N — [CRITICAL: 9.8]','#ff2244']];return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="360" height="156" fill="#020206"/>${lines.map(([t,c],i)=>`<text x="10" y="${13+i*12}" font-family="monospace" font-size="6" fill="${c}">${t}</text>`).join('')}<rect y="138" width="360" height="18" fill="rgba(255,34,68,0.07)" stroke="rgba(255,34,68,0.15)" stroke-width=".5"/><text x="10" y="150" font-family="monospace" font-size="5.5" fill="#ff2244">⬛ CONTROLLED ENV — AUTHORIZED SECURITY RESEARCH ONLY — NO LIVE TARGETS</text></svg>`}
+
+function svgWebdev(a){return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="360" height="156" fill="#020206"/>
+<rect width="360" height="18" fill="#0c0c1e"/>
+<circle cx="11" cy="9" r="3.5" fill="#ff5f57"/><circle cx="22" cy="9" r="3.5" fill="#febc2e"/><circle cx="33" cy="9" r="3.5" fill="#28c840"/>
+<text x="44" y="13" font-family="monospace" font-size="5.5" fill="#404060">index.html — Transcendent App Dev</text>
+<rect x="0" y="18" width="175" height="138" fill="#050509"/>
+<rect x="175" y="18" width="185" height="138" fill="#f4f5f7"/>
+${[['&lt;!DOCTYPE html&gt;','rgba(255,255,255,0.2)'],['&lt;html lang="en"&gt;','rgba(255,255,255,0.2)'],['  &lt;head&gt;','rgba(255,255,255,0.14)'],['    &lt;meta charset="UTF-8"&gt;','rgba(100,180,255,0.65)'],['    &lt;title&gt;D3 Portfolio&lt;/title&gt;','rgba(180,230,120,0.8)'],['  &lt;/head&gt;','rgba(255,255,255,0.14)'],['  &lt;body&gt;','rgba(255,255,255,0.18)'],['    &lt;canvas id="bg"&gt;','rgba(100,180,255,0.65)'],['    &lt;/canvas&gt;','rgba(100,180,255,0.65)'],['    &lt;header class="hero"&gt;','rgba(100,180,255,0.65)'],['      &lt;h1&gt;DUNNSKEE3&lt;/h1&gt;','rgba(180,230,120,0.8)']].map(([t,c],i)=>`<text x="8" y="${30+i*11}" font-family="monospace" font-size="5.5" fill="${c}">${t}</text>`).join('')}
+<rect x="181" y="24" width="173" height="10" fill="#1a1a2e" rx="1"/>
+<text x="267" y="32" font-family="monospace" font-size="5" fill="#606080" text-anchor="middle">dunnskee3.dev</text>
+<rect x="181" y="40" width="173" height="20" fill="#0d1117" rx="1"/>
+<text x="267" y="53" font-family="monospace" font-size="9" fill="${a}" text-anchor="middle" font-weight="bold">DUNNSKEE3</text>
+<rect x="181" y="66" width="173" height="1.5" fill="rgba(68,136,255,0.35)"/>
+<rect x="181" y="74" width="130" height="3" fill="#d0d0d8" rx="1"/>
+<rect x="181" y="82" width="90" height="3" fill="#d0d0d8" rx="1"/>
+<rect x="181" y="90" width="110" height="3" fill="#d0d0d8" rx="1"/>
+<rect x="181" y="104" width="70" height="16" fill="${a}" rx="2"/>
+<text x="216" y="115" font-family="monospace" font-size="5.5" fill="#050508" text-anchor="middle">View Work →</text>
+<rect x="257" y="104" width="90" height="16" fill="transparent" stroke="${a}" stroke-width="1" rx="2"/>
+<text x="302" y="115" font-family="monospace" font-size="5.5" fill="${a}" text-anchor="middle">Contact</text>
+</svg>`}
+
+function svgAnalytics(a){return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="360" height="156" fill="#020206"/>
+<text x="12" y="18" font-family="monospace" font-size="9" fill="${a}" font-weight="bold">COURTSIDE SKEPTIC</text>
+<text x="12" y="28" font-family="monospace" font-size="4.5" fill="#404060">NBA PROP ANALYTICS — QUANTITATIVE MODEL STACK — KELLY CRITERION</text>
+${[['ELO DELTA','+186','#ffaa00'],['EDGE','+12.4%','#00f5c0'],['EXP VAL','+$34.2','#00f5c0'],['KELLY','f*=0.18','#ffaa00']].map(([l,v,c],i)=>`<rect x="${12+i*84}" y="34" width="72" height="28" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.04)" stroke-width=".5"/><text x="${48+i*84}" y="50" font-family="monospace" font-size="9" fill="${c}" font-weight="bold" text-anchor="middle">${v}</text><text x="${48+i*84}" y="58" font-family="monospace" font-size="3.5" fill="#404060" text-anchor="middle">${l}</text>`).join('')}
+<rect x="12" y="70" width="210" height="78" fill="rgba(255,255,255,0.01)" stroke="rgba(255,255,255,0.04)" stroke-width=".5"/>
+<text x="18" y="80" font-family="monospace" font-size="4" fill="#404060">MONTE CARLO — 10,000 SIMULATIONS</text>
+${[18,30,46,62,76,86,76,60,44,30,20,13].map((h,i)=>`<rect x="${20+i*16}" y="${136-h}" width="12" height="${h}" fill="rgba(255,170,0,${0.1+h/130})" stroke="rgba(255,170,0,0.15)" stroke-width=".5"/>`).join('')}
+<line x1="12" y1="136" x2="222" y2="136" stroke="rgba(255,255,255,0.05)" stroke-width=".5"/>
+<rect x="228" y="70" width="120" height="78" fill="rgba(255,170,0,0.04)" stroke="rgba(255,170,0,0.12)" stroke-width=".5"/>
+<text x="234" y="80" font-family="monospace" font-size="4" fill="#ffaa00">◆ DIAMOND PLAYS</text>
+${[['LeBron James','PTS O/U 27.5','92%'],['Nikola Jokić','REB O/U 11.5','88%'],['Jayson Tatum','AST O/U 5.5','85%']].map(([p,l,c],i)=>`<rect x="228" y="${86+i*18}" width="120" height="16" fill="rgba(255,170,0,0.03)"/><text x="234" y="${96+i*18}" font-family="monospace" font-size="4.5" fill="#a09060">${p}</text><text x="234" y="${104+i*18}" font-family="monospace" font-size="3.5" fill="#605040">${l}</text><text x="340" y="${96+i*18}" font-family="monospace" font-size="5" fill="#ffaa00" text-anchor="end" font-weight="bold">${c}</text>`).join('')}
+</svg>`}
+
+function svgArtist(a){return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="360" height="156" fill="#08000e"/>
+<text x="180" y="105" font-family="Georgia,serif" font-size="90" fill="rgba(170,68,255,0.05)" text-anchor="middle" font-weight="bold">PAY</text>
+${'PAYMEZAY'.split('').map((l,i)=>`<text x="${26+i*38}" y="74" font-family="Georgia,serif" font-size="24" fill="rgba(170,68,255,${0.3+i*0.09})" font-weight="bold" font-style="italic">${l}</text>`).join('')}
+<text x="180" y="90" font-family="monospace" font-size="5.5" fill="rgba(255,255,255,0.25)" text-anchor="middle" letter-spacing="6">THE REDACTED VAULT</text>
+${[0,1,2,3].map(i=>`<rect x="${12+i*88}" y="104" width="76" height="44" fill="rgba(170,68,255,0.${1+i*2})"/><rect x="${12+i*88}" y="104" width="76" height="44" fill="rgba(0,0,0,0.55)"/><text x="${50+i*88}" y="129" font-family="monospace" font-size="10" fill="rgba(170,68,255,0.5)" text-anchor="middle">▶</text><rect x="${12+i*88}" y="142" width="76" height="3" fill="rgba(170,68,255,0.15)"/><rect x="${12+i*88}" y="142" width="${22+i*12}" height="3" fill="rgba(170,68,255,0.55)"/>`).join('')}
+<rect width="360" height="18" fill="rgba(0,0,0,0.65)"/>
+<text x="12" y="12" font-family="monospace" font-size="6.5" fill="rgba(170,68,255,0.85)" font-weight="bold">PAYMEZAY</text>
+${['MUSIC','VIDEOS','MERCH','CONTACT'].map((t,i)=>`<text x="${190+i*44}" y="12" font-family="monospace" font-size="5" fill="rgba(255,255,255,0.35)">${t}</text>`).join('')}
+</svg>`}
+
+function svgAutomation(a){
+  const nodes=[['SCRAPE','LinkedIn\nScout','#4488ff'],['SCORE','AI Ranker','#ffaa00'],['DRAFT','Claude\nCopy','#00f5c0'],['CRM','Enroll','#aa44ff'],['SEQ','Follow-up','#ff7c35']];
+  return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+<rect width="360" height="156" fill="#020208"/>
+<text x="12" y="14" font-family="monospace" font-size="7" fill="${a}" font-weight="bold">B2B LEAD GENERATION AUTOMATION PIPELINE</text>
+<text x="12" y="24" font-family="monospace" font-size="4.5" fill="#404060">n8n ORCHESTRATION · PHANTOMBUSTER · CLAUDE AI · CRM INTEGRATION</text>
+${nodes.map(([label,name,c],i)=>{
+  const x=14+i*68,y=36,w=58,h=44;
+  return`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="rgba(255,255,255,0.025)" stroke="${c}" stroke-width="0.8" rx="2"/>
+<rect x="${x}" y="${y}" width="${w}" height="10" fill="${c}22" rx="2"/>
+<text x="${x+w/2}" y="${y+7.5}" font-family="monospace" font-size="5" fill="${c}" text-anchor="middle" font-weight="bold">${label}</text>
+<text x="${x+w/2}" y="${y+22}" font-family="monospace" font-size="5.5" fill="#c0c0d8" text-anchor="middle">${name.split('\n')[0]}</text>
+<text x="${x+w/2}" y="${y+31}" font-family="monospace" font-size="5.5" fill="#c0c0d8" text-anchor="middle">${name.split('\n')[1]||''}</text>
+<circle cx="${x+w/2}" cy="${y+h-7}" r="3" fill="${c}55" stroke="${c}" stroke-width="0.5"/>
+${i<nodes.length-1?`<line x1="${x+w}" y1="${y+h/2}" x2="${x+w+10}" y2="${y+h/2}" stroke="${c}" stroke-width="0.8" stroke-dasharray="2,1"/><polygon points="${x+w+10},${y+h/2-3} ${x+w+10},${y+h/2+3} ${x+w+14},${y+h/2}" fill="${c}"/>`:''}`}).join('')}
+<rect x="12" y="90" width="336" height="1" fill="rgba(255,255,255,0.04)"/>
+<text x="12" y="103" font-family="monospace" font-size="5" fill="#404060">PIPELINE METRICS — LAST 30 DAYS</text>
+${[['LEADS SCRAPED','2,847','#4488ff'],['AI SCORED','1,203','#ffaa00'],['EMAILS SENT','891','#00f5c0'],['REPLY RATE','18.4%','#ff7c35'],['MEETINGS','34','#aa44ff']].map(([l,v,c],i)=>`
+<rect x="${12+i*68}" y="108" width="58" height="38" fill="rgba(255,255,255,0.015)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+<text x="${41+i*68}" y="124" font-family="monospace" font-size="9" fill="${c}" font-weight="bold" text-anchor="middle">${v}</text>
+<text x="${41+i*68}" y="140" font-family="monospace" font-size="3.5" fill="#404060" text-anchor="middle">${l}</text>`).join('')}
+</svg>`}
+
+function svgDiamondIce(a){
+  return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+<rect width="360" height="156" fill="#020208"/>
+<text x="12" y="13" font-family="monospace" font-size="7.5" fill="${a}" font-weight="bold">DIAMOND &amp; ICE ANALYTICS</text>
+<text x="12" y="23" font-family="monospace" font-size="4.5" fill="#404060">MLB · NHL · n8n ENSEMBLE · THE ODDS API · MULTI-SPORT PROP ENGINE</text>
+<line x1="180" y1="28" x2="180" y2="156" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+<!-- MLB SIDE -->
+<text x="90" y="37" font-family="monospace" font-size="5" fill="#60a0ff" text-anchor="middle">MLB ◆ BASEBALL</text>
+<rect x="65" y="42" width="50" height="50" fill="rgba(68,136,255,0.06)" stroke="rgba(68,136,255,0.15)" stroke-width="0.5" transform="rotate(45 90 67)"/>
+<circle cx="90" cy="67" r="3" fill="rgba(68,136,255,0.4)" stroke="#4488ff" stroke-width="0.8"/>
+${[[90,47],[110,67],[90,87],[70,67]].map(([cx,cy])=>`<circle cx="${cx}" cy="${cy}" r="2.5" fill="rgba(68,136,255,0.3)" stroke="#4488ff" stroke-width="0.6"/>`).join('')}
+${[['xFIP','2.81','#60a0ff'],[' ERA+','134','#60a0ff'],['BABIP','.298','#60a0ff']].map(([l,v,c],i)=>`
+<rect x="${16+i*42}" y="100" width="38" height="22" fill="rgba(68,136,255,0.04)" stroke="rgba(68,136,255,0.1)" stroke-width="0.5"/>
+<text x="${35+i*42}" y="111" font-family="monospace" font-size="7" fill="${c}" text-anchor="middle" font-weight="bold">${v}</text>
+<text x="${35+i*42}" y="119" font-family="monospace" font-size="3.5" fill="#404060" text-anchor="middle">${l}</text>`).join('')}
+${[['OHTANI','HR O/U 0.5','91%'],['JUDGE','RBI O/U 1.5','87%']].map(([p,l,c],i)=>`
+<rect x="16" y="${126+i*14}" width="154" height="12" fill="rgba(68,136,255,0.03)"/>
+<text x="22" y="${135+i*14}" font-family="monospace" font-size="4.5" fill="#8090c0">${p}</text>
+<text x="80" y="${135+i*14}" font-family="monospace" font-size="4" fill="#506080">${l}</text>
+<text x="162" y="${135+i*14}" font-family="monospace" font-size="5" fill="#4488ff" text-anchor="end" font-weight="bold">${c}</text>`).join('')}
+<!-- NHL SIDE -->
+<text x="270" y="37" font-family="monospace" font-size="5" fill="${a}" text-anchor="middle">NHL ❄ HOCKEY</text>
+<ellipse cx="270" cy="67" rx="48" ry="28" fill="rgba(0,212,255,0.04)" stroke="rgba(0,212,255,0.2)" stroke-width="0.8"/>
+<ellipse cx="270" cy="67" rx="12" ry="8" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="0.5"/>
+<line x1="222" y1="67" x2="318" y2="67" stroke="rgba(0,212,255,0.1)" stroke-width="0.5"/>
+<circle cx="240" cy="52" r="3" fill="rgba(0,212,255,0.35)" stroke="${a}" stroke-width="0.6"/>
+<circle cx="300" cy="52" r="3" fill="rgba(0,212,255,0.35)" stroke="${a}" stroke-width="0.6"/>
+<circle cx="240" cy="82" r="3" fill="rgba(0,212,255,0.35)" stroke="${a}" stroke-width="0.6"/>
+<circle cx="300" cy="82" r="3" fill="rgba(0,212,255,0.35)" stroke="${a}" stroke-width="0.6"/>
+${[['CF%','56.2','#00d4ff'],['xGF%','61.4','#00d4ff'],['PDO','103.1','#00d4ff']].map(([l,v,c],i)=>`
+<rect x="${196+i*42}" y="100" width="38" height="22" fill="rgba(0,212,255,0.04)" stroke="rgba(0,212,255,0.1)" stroke-width="0.5"/>
+<text x="${215+i*42}" y="111" font-family="monospace" font-size="7" fill="${c}" text-anchor="middle" font-weight="bold">${v}</text>
+<text x="${215+i*42}" y="119" font-family="monospace" font-size="3.5" fill="#404060" text-anchor="middle">${l}</text>`).join('')}
+${[['MCDAVID','POINTS O/U 1.5','94%'],['HEDMAN','SOG O/U 2.5','88%']].map(([p,l,c],i)=>`
+<rect x="190" y="${126+i*14}" width="158" height="12" fill="rgba(0,212,255,0.03)"/>
+<text x="196" y="${135+i*14}" font-family="monospace" font-size="4.5" fill="#60a0b0">${p}</text>
+<text x="254" y="${135+i*14}" font-family="monospace" font-size="4" fill="#405060">${l}</text>
+<text x="340" y="${135+i*14}" font-family="monospace" font-size="5" fill="${a}" text-anchor="end" font-weight="bold">${c}</text>`).join('')}
+</svg>`}
+
+function svgTerranova(a){
+  return`<svg viewBox="0 0 360 156" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+<rect width="360" height="156" fill="#f7f6f2"/>
+<rect width="360" height="20" fill="#1c2b1a"/>
+<text x="14" y="13.5" font-family="Georgia,serif" font-size="8" fill="#4ade80" font-weight="bold" font-style="italic">TerraNova</text>
+<text x="82" y="13" font-family="monospace" font-size="5" fill="rgba(255,255,255,0.4)">Off-Grid Supply Co.</text>
+${['SHOP','SURVIVAL KITS','POWER','WATER','ABOUT'].map((t,i)=>`<text x="${200+i*32}" y="13" font-family="monospace" font-size="4.5" fill="rgba(255,255,255,0.45)">${t}</text>`).join('')}
+<rect x="0" y="20" width="360" height="48" fill="#2d3d2b"/>
+<text x="180" y="40" font-family="Georgia,serif" font-size="10" fill="#f0f0e8" text-anchor="middle" font-style="italic">Built for What Comes Next.</text>
+<text x="180" y="54" font-family="monospace" font-size="5" fill="rgba(255,255,255,0.4)" text-anchor="middle">EMERGENCY POWER · WATER FILTRATION · SURVIVAL GEAR</text>
+<rect x="140" y="58" width="80" height="10" fill="#4ade80" rx="1"/>
+<text x="180" y="65.5" font-family="monospace" font-size="5" fill="#1c2b1a" text-anchor="middle" font-weight="bold">SHOP ALL KITS →</text>
+${[[10,'Solar Gen Kit','$849','★★★★★'],[130,'Water Filter Pro','$149','★★★★★'],[250,'72hr Bug-Out Bag','$299','★★★★☆']].map(([x,name,price,stars])=>`
+<rect x="${x}" y="72" width="110" height="78" fill="#ffffff" stroke="#e0e0d0" stroke-width="0.5"/>
+<rect x="${x}" y="72" width="110" height="40" fill="#e8ede6"/>
+<text x="${x+55}" y="98" font-family="Georgia,serif" font-size="7" fill="#3a5038" text-anchor="middle" font-style="italic">${name.split(' ').slice(0,2).join(' ')}</text>
+<text x="${x+55}" y="107" font-family="Georgia,serif" font-size="7" fill="#3a5038" text-anchor="middle" font-style="italic">${name.split(' ').slice(2).join(' ')}</text>
+<text x="${x+8}" y="122" font-family="monospace" font-size="5" fill="#5a7a58">${stars}</text>
+<text x="${x+8}" y="134" font-family="Georgia,serif" font-size="9" fill="#1c2b1a" font-weight="bold">${price}</text>
+<rect x="${x+8}" y="139" width="94" height="8" fill="#4ade80" rx="1"/>
+<text x="${x+55}" y="145.5" font-family="monospace" font-size="4.5" fill="#1c2b1a" text-anchor="middle">ADD TO CART</text>`).join('')}
+</svg>`}
+
+/* ── PROJECT DATA ─────────────────────────────────────── */
+const PROJECTS=[
+{id:'lgcy',title:'LGCY AI Command Center',cat:'AI/ML',status:'LIVE',cl:'RESTRICTED',accent:'#00f5c0',svg:svgLgcy,
+desc:'Enterprise-grade AI SaaS admin dashboard. Multi-model routing across Claude, Gemini, Groq & HuggingFace. WordPress REST API sync, SEO intelligence module, 14-phase MySQL brand schema.',
+tech:['React','Node.js','MySQL','Claude AI','Gemini','Groq','WordPress REST API'],
+steps:[
+{icon:'◈',title:'Project Overview',body:'The LGCY AI Command Center is a full-stack SaaS admin dashboard built for a brand scaling operation. It centralizes AI-powered content generation, SEO optimization, and WordPress management into a single command interface — replacing five disconnected tools with one intelligent system.'},
+{icon:'⬡',title:'System Architecture',body:'Built on React with serverless API endpoints deployed on Vercel. The backend uses MySQL for persistent data storage with 14 phases of brand intelligence pre-seeded into the schema. API routes are isolated per service for independent scaling and security compartmentalization. Environment variables managed through Vercel dashboard — no secrets in version control.'},
+{icon:'⟁',title:'Multi-AI Model Routing',body:'The routing layer intelligently distributes requests across Claude (Anthropic), Gemini (Google), Groq, and HuggingFace based on task type and cost. Claude handles brand voice consistency. Gemini handles search-grounded real-time research. Groq handles speed-critical generation tasks. The system degrades gracefully if any model endpoint is unavailable.'},
+{icon:'⊕',title:'WordPress Integration',body:'Live two-way sync with the client\'s WordPress instance via REST API. Posts, pages, and custom post types can be drafted, scheduled, and published directly from the Command Center — no switching to the WordPress backend. The integration authenticates via application passwords and respects user roles and draft workflows.'},
+{icon:'◎',title:'SEO Intelligence Module',body:'Integrated keyword research, real-time meta tag generation, competitive gap analysis, and content optimization scoring. The SEO module connects to the multi-AI routing layer to generate content briefs and audit existing pages against current ranking signals — delivering actionable recommendations without leaving the dashboard.'}
+]},
+{id:'sql',title:'SQL Injection Security Lab',cat:'Security',status:'DEMO',cl:'CONTROLLED',accent:'#ff2244',svg:svgSecurity,
+desc:'Controlled penetration testing environment demonstrating SQL injection attack vectors, defense implementation, and CVSS-scored vulnerability documentation. OWASP Top 10 aligned methodology.',
+tech:['Python','SQLite','OWASP Top 10','Prepared Statements','WAF Rules','CVSS 3.1'],
+steps:[
+{icon:'◈',title:'Lab Overview',body:'A controlled security testing environment built to demonstrate, detect, and defend against SQL injection attacks. Constructed following OWASP Top 10 guidelines to simulate real-world vulnerability scenarios in a safe, isolated context. All attack techniques are documented strictly for defensive awareness and remediation purposes — no live targets involved.'},
+{icon:'⚡',title:'Attack Vectors Demonstrated',body:'The lab covers four injection classes: Union-based injection (extracting data from other tables via crafted UNION SELECT), Blind Boolean injection (inferring data through HTTP true/false response differences), Time-based Blind injection (using database SLEEP() delays as a covert signal channel), and Error-based injection (harvesting structured data through database error messages).'},
+{icon:'⊞',title:'Defense Implementation',body:'Countermeasures implemented and verified include parameterized queries with prepared statements (eliminating injection at the parse level), strict input validation and allowlisting, stored procedure isolation with least-privilege accounts, WAF rule configuration for common payloads, and intrusion detection logging that triggers on repeated injection signatures.'},
+{icon:'◎',title:'Testing Methodology & Scoring',body:'Follows a structured pentest lifecycle: Reconnaissance → Discovery → Enumeration → Controlled Exploitation → Evidence Documentation → Remediation → Verification Re-test. All findings are CVSS v3.1 scored with attack vector, complexity, privileges required, and impact ratings. Output: a prioritized remediation report with severity classifications and proof-of-concept evidence.'}
+]},
+{id:'webdev',title:'Web Dev Foundations',cat:'Web Dev',status:'DEMO',cl:'OPEN',accent:'#4488ff',svg:svgWebdev,
+desc:'Comprehensive demonstration of core web development fundamentals: semantic HTML5, advanced CSS techniques, modern JavaScript patterns, and zero-config Vercel deployment pipeline.',
+tech:['HTML5','CSS3','JavaScript ES2024','CSS Grid','Flexbox','Intersection Observer API'],
+steps:[
+{icon:'◈',title:'Semantic HTML Architecture',body:'Every build starts with proper document structure: semantic HTML5 elements (nav, main, section, article, aside), ARIA landmark roles and attributes for screen reader compatibility, structured data markup (JSON-LD) for SEO, and progressive enhancement — fully functional without JavaScript, then enhanced with it. Clean markup is the foundation of maintainable, accessible code.'},
+{icon:'⬡',title:'Advanced CSS Techniques',body:'CSS techniques deployed across projects: Custom Properties for dynamic theming with runtime switching, CSS Grid for two-dimensional layouts with subgrid, Flexbox for component-level alignment, @keyframes animations with staggered animation-delay reveals, CSS clamp() for fluid responsive typography with no breakpoints, and scroll-driven animations using the native Animation API — no JavaScript required.'},
+{icon:'⟁',title:'Modern JavaScript Patterns',body:'Patterns used across builds: Async/Await with AbortController for cancellable API calls, Intersection Observer API for scroll-triggered effects with threshold and rootMargin tuning, Event delegation for dynamically rendered content performance, Module pattern for code organization without build tools, and native Pointer Events for drag interactions with velocity-based momentum scrolling.'},
+{icon:'⊕',title:'Zero-Config Deployment',body:'All projects deploy to Vercel with no build configuration. Workflow: Git push to main → Vercel CI/CD detects changes → preview URL generated in under 30 seconds → one-click promotion to production. Environment variables managed through Vercel dashboard. Custom domains provisioned in under 5 minutes with automatic SSL via Let\'s Encrypt and global edge CDN distribution.'}
+]},
+{id:'courtside',title:'Courtside Skeptic',cat:'Analytics',status:'ACTIVE',cl:'RESTRICTED',accent:'#ffaa00',svg:svgAnalytics,
+desc:'Quantitative NBA player prop analytics engine. Layered Elo, Poisson, Monte Carlo, and Kelly Criterion models with adversarial validation passes filtering blowout risk, injury gates, and line inflation.',
+tech:['JavaScript','The Odds API','Elo Algorithm','Monte Carlo','Kelly Criterion','Poisson Modeling'],
+steps:[
+{icon:'◈',title:'Engine Overview',body:'Courtside Skeptic is a quantitative NBA analytics engine that evaluates player prop lines through layered statistical models. Built to surface market inefficiencies in sportsbook pricing through mathematical rigor rather than intuition. The engine ingests live odds via The Odds API, processes them through four models in parallel, and outputs confidence-scored recommendations.'},
+{icon:'⬡',title:'Statistical Model Stack',body:'Four models run in parallel for every evaluated prop: Elo ratings track team and player performance trajectories over rolling 30-game windows. Poisson distribution models per-game stat accumulation rates and expected distributions. Monte Carlo simulation runs 10,000 game iterations to generate full probability distributions. Regression-to-mean algorithms detect and discount hot/cold variance spikes to prevent recency bias.'},
+{icon:'⟁',title:'Kelly Criterion Bet Sizing',body:'Once statistical edge is confirmed, the Kelly Criterion formula (f* = (b·p − q) / b) calculates optimal wager size to maximize long-run bankroll growth while controlling for ruin risk. All outputs use Fractional Kelly (25–50% of full Kelly) to reduce variance and account for model uncertainty. Bet sizing is proportional to edge magnitude — larger edges get larger allocations.'},
+{icon:'⊞',title:'Risk Filter Pipeline',body:'Adversarial validation passes run before any play is surfaced: blowout risk detection flags games projected for 20+ point margins (garbage time invalidates most props). Injury gate checks verify player availability from daily reports. Line inflation detection identifies props where the market has moved against our position. Rest risk, schedule density, and end-of-season motivation analysis are all gated.'},
+{icon:'◎',title:'Diamond Play Framework',body:'The highest-confidence designations — Diamond plays — require five simultaneous signals to converge: statistical edge above 8% confirmed by the model stack, positive expected value across all four model outputs, zero disqualifying risk flags triggered in the filter pipeline, detectable market inefficiency (line stable or moving favorably), and recent 10-game form alignment with the projected statistical output.'}
+]},
+{id:'paymezay',title:'Paymezay Artist Portal',cat:'Web Dev',status:'LIVE',cl:'OPEN',accent:'#aa44ff',svg:svgArtist,
+desc:'Dark luxury artist website for rapper Paymezay. Letter-by-letter animated loaders, ghost watermarks, horizontal momentum drag-scroll gallery — single self-contained HTML file on Vercel.',
+tech:['HTML5','CSS3','Vanilla JS','Intersection Observer','Pointer Events API','Vercel'],
+steps:[
+{icon:'◈',title:'Creative Direction',body:'The Paymezay site required a dark luxury aesthetic: obsidian blacks, deep crimson, and gold accents matching the artist\'s street-luxury brand identity. The brief was to make the site feel like a classified intel file on someone too important to be ordinary. Every design decision was pulled directly from the music — raw but controlled, aggressive but refined, anonymous but commanding.'},
+{icon:'⬡',title:'Animation System',body:'The page load sequence features a letter-by-letter text reveal for the artist name using staggered CSS animation-delay values — 26ms per character. A ghost watermark pulses at 5% opacity behind content using @keyframes opacity cycling. Scroll-triggered card reveals use Intersection Observer with threshold: 0.15 and rootMargin tuning. The combined result: a cinematic entrance that demands attention before a single word registers.'},
+{icon:'⟁',title:'Momentum Drag-Scroll Gallery',body:'A custom horizontal gallery displays album artwork and tracks built entirely with native Pointer Events — zero library dependencies. Supports mouse drag, touch swipe, and trackpad gestures. Velocity is calculated from pointer delta between events. On release, a requestAnimationFrame friction loop decelerates the scroll with a 0.92 multiplier per frame, producing a premium momentum feel indistinguishable from native mobile scrolling.'},
+{icon:'⊕',title:'Single-File Architecture',body:'Delivered as one fully self-contained HTML file — all styles inlined, all scripts embedded, all assets base64 encoded where feasible. Zero build steps. Zero dependencies. Zero Node.js required. The client updates content by swapping one file. Deployed to Vercel with a custom domain: automatic SSL provisioned, global CDN active, preview URLs on every push. Cold-start load time: under 900ms worldwide.'}
+]}
+,{id:'leadgen',title:'B2B Lead Gen Automation',cat:'Automation',status:'ACTIVE',cl:'CONTROLLED',accent:'#ff7c35',svg:svgAutomation,
+desc:'End-to-end B2B outreach automation pipeline. PhantomBuster scrapes LinkedIn prospects, Claude AI scores and drafts personalized cold emails, n8n orchestrates the entire flow into CRM enrollment and follow-up sequences.',
+tech:['n8n','PhantomBuster','Claude AI','LinkedIn API','CRM Integration','Webhooks','Cold Email'],
+steps:[
+{icon:'◈',title:'Pipeline Overview',body:'A fully automated B2B lead generation system that runs 24/7 without manual intervention. PhantomBuster handles LinkedIn prospecting, Claude handles AI-scored qualification and personalized copy generation, n8n wires the entire workflow together, and a CRM receives enrolled leads with full activity history attached from first touch.'},
+{icon:'⬡',title:'Prospect Scraping & Scoring',body:'PhantomBuster runs scheduled LinkedIn Sales Navigator scrapes targeting ICP-matched decision makers by title, company size, industry, and growth signals. Each raw lead is passed to a Claude-powered scoring function that evaluates fit across 12 criteria, assigns a 0–100 confidence score, and filters out leads below the threshold before any outreach dollars are spent.'},
+{icon:'⟁',title:'AI-Personalized Cold Outreach',body:'Qualified leads pass through a Claude prompt that reads the prospect\'s LinkedIn headline, recent activity, and company context to generate a personalized first line and full email sequence — not a template with a name swapped in. Each email is evaluated for spam signal risk, readability score, and CTA clarity before being released to the send queue. Average reply rate: 18.4%.'},
+{icon:'⊞',title:'n8n Orchestration Architecture',body:'n8n serves as the workflow brain: webhook triggers fire on new CRM contacts, parallel branches handle email enrichment, deduplication checks, DNS validation, and unsubscribe list cross-referencing simultaneously. Failed nodes surface in a Slack alerting channel with error context. The DAG (Directed Acyclic Graph) structure ensures no lead is double-touched or missed due to a partial failure.'},
+{icon:'◎',title:'CRM Enrollment & Follow-up Sequences',body:'Qualified, contacted leads enroll automatically into the CRM with full enrichment: company data, LinkedIn URL, AI score, email sequence stage, and all prior activity logged. Multi-touch follow-up sequences (Day 1, Day 4, Day 9, Day 18) are managed by n8n using time-delay nodes and reply-detection gates that pause or terminate sequences the moment a prospect responds.'}
+]},
+{id:'diamondice',title:'Diamond & Ice Analytics Suite',cat:'Analytics',status:'ACTIVE',cl:'RESTRICTED',accent:'#00d4ff',svg:svgDiamondIce,
+desc:'Multi-sport MLB/NHL prop analytics engine extending the Courtside Skeptic architecture. n8n ensemble workflow with parallel sport branches, advanced hockey metrics (Corsi, xGF%), and baseball sabermetrics (xFIP, BABIP, wRC+).',
+tech:['JavaScript','n8n Cloud','The Odds API','MLB Stats API','NHL API','Corsi/CF%','xFIP','Poisson'],
+steps:[
+{icon:'◈',title:'Multi-Sport Architecture',body:'Diamond & Ice extends the quantitative prop analytics framework from NBA into baseball and hockey simultaneously. Rather than a single-sport pipeline, n8n Cloud runs parallel branches — one per sport — that execute independently, aggregate independently, and only merge at the final output layer. Losing one branch never blocks the other; the architecture degrades gracefully.'},
+{icon:'⬡',title:'Baseball Analytics Engine (MLB)',body:'The MLB branch ingests live odds from The Odds API and cross-references them against a sabermetrics model using xFIP (expected Fielding Independent Pitching), BABIP (Batting Average on Balls In Play), wRC+ (Weighted Runs Created Plus), and launch angle/exit velocity spray charts from the MLB Stats API. Props are evaluated against expected statistical distributions, not raw averages.'},
+{icon:'⟁',title:'Hockey Analytics Engine (NHL)',body:'The NHL branch models props using possession-based advanced metrics: Corsi For % (shot attempt differential), xGF% (expected goals for percentage from shot quality models), PDO (shooting% + save% as a variance regressor), and zone entry/exit data. These underlying metrics are far more predictive than goals or assists in isolation, catching props the market prices on narrative rather than possession reality.'},
+{icon:'⊞',title:'n8n Ensemble Workflow',body:'n8n Cloud orchestrates the full pipeline: scheduled webhook triggers pull fresh odds on a rolling 4-hour cycle, parallel HTTP request nodes hit both sport APIs simultaneously, transformation nodes normalize the data schemas, scoring nodes run the statistical models, and a merge node combines outputs before filtering. The DAG runs in under 90 seconds from trigger to final output for both sports combined.'},
+{icon:'◎',title:'Cross-Sport Edge Detection',body:'The most powerful feature is cross-sport correlation detection — identifying when two props from different sports are statistically independent and can be safely parlayed for amplified EV. The system calculates a correlation coefficient between any two candidate props and only surfaces multi-leg combinations where the coefficient is below 0.12, ensuring the legs are genuinely independent rather than secretly correlated through a shared market variable.'}
+]},
+{id:'terranova',title:'TerraNova Off-Grid Supply',cat:'Client Work',status:'LIVE',cl:'OPEN',accent:'#4ade80',svg:svgTerranova,
+desc:'Full client e-commerce website for TerraNova Off-Grid Supply Co. Custom design system, product catalog architecture, Vercel deployment with edge CDN, and a handoff package built for non-technical client management.',
+tech:['HTML5','CSS3','JavaScript','Vercel','Custom Design System','E-Commerce UX','Client Delivery'],
+steps:[
+{icon:'◈',title:'Client Brief & Discovery',body:'TerraNova Off-Grid Supply needed a full web presence for their emergency preparedness and off-grid gear brand — no existing site, no brand guidelines, just a product catalog and a vision. Discovery involved two sessions to extract ICP (target customer), brand voice, product hierarchy, and business priorities. Output: a creative brief, content inventory, and a wireframe-to-design execution plan with delivery milestones.'},
+{icon:'⬡',title:'Design System & Brand Identity',body:'Built a ground-up design system: a muted earth palette (deep forest greens, warm off-whites, stone grays) that communicates reliability and ruggedness without looking tactical. Typography pairs a Georgia serif for authority and warmth with a monospace stack for spec/data readability. Every component — buttons, cards, badges, nav states — was defined before a line of production code was written.'},
+{icon:'⟁',title:'E-Commerce UX Architecture',body:'Product catalog structured around three primary customer journeys: emergency preparedness newcomers (curated kits), experienced preppers (individual components), and gifters (bundle sets). Category filtering, sorting by price/rating/newest, and persistent cart state are all handled in vanilla JavaScript — no framework, no external state library. The goal was maximum performance with zero dependency risk.'},
+{icon:'⊕',title:'Vercel Deployment & Client Handoff',body:'Deployed to Vercel with a custom domain, automatic SSL, and edge CDN distribution — pages serve globally in under 400ms. Alongside the live site, the client received a full handoff package: a Notion-based content management guide, a video walkthrough of how to update product info, and a one-page support SLA document. The client can manage day-to-day content without ever touching a code file.'}
+]}
+];
+
+/* ── RENDER CARDS ─────────────────────────────────────── */
+function renderCards(f='All'){
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  PROJECTS.filter(p=>f==='All'||p.cat===f).forEach((p,i)=>{
+    const cl={'RESTRICTED':'cl-r','CONTROLLED':'cl-c','OPEN':'cl-o'}[p.cl];
+    const card=document.createElement('div');
+    card.className='card';
+    card.style.setProperty('--ca',p.accent);
+    card.onclick=()=>open_(p.id);
+    card.innerHTML=`
+<div class="card-head">
+  <div class="cat-badge">${p.cat}</div>
+  <div class="status-badge"><div class="s-dot"></div>${p.status}</div>
+</div>
+<div class="thumb">${p.svg(p.accent)}<div class="thumb-lock"><div class="lock-icon">⬛ VIEW WALKTHROUGH</div></div></div>
+<div class="card-body">
+  <div class="card-title">${p.title}</div>
+  <div class="card-desc">${p.desc}</div>
+  <div class="tags">${p.tech.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+</div>
+<div class="card-foot">
+  <div class="class-label ${cl}">⬛ ${p.cl}</div>
+  <button class="view-btn" style="--ca:${p.accent}">VIEW PROJECT →</button>
+</div>`;
+    grid.appendChild(card);
+    // staggered reveal — JS driven for 100% reliability across all 8 cards
+    setTimeout(()=>card.classList.add('show'), 60 + i * 80);
+  });
+}
+
+function filter(f,btn){
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards(f);
+}
+
+/* ── MODAL ────────────────────────────────────────────── */
+let CUR=null,STEP=0;
+
+function open_(id){
+  CUR=PROJECTS.find(p=>p.id===id);
+  STEP=0;
+  sync_();
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function close_(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+  setTimeout(()=>{CUR=null;STEP=0;},300);
+}
+function handleOvClick(e){if(e.target===document.getElementById('overlay'))close_();}
+function next_(){if(!CUR)return;if(STEP>=CUR.steps.length-1){close_();return;}STEP++;sync_();}
+function prev_(){if(STEP>0){STEP--;sync_();}}
+function goStep(i){STEP=i;sync_();}
+
+function sync_(){
+  if(!CUR)return;
+  const s=CUR.steps[STEP],tot=CUR.steps.length;
+  // bar
+  document.getElementById('m-title').textContent=CUR.title;
+  const mc=document.getElementById('m-class');
+  mc.textContent=CUR.cl;
+  mc.style.color={'RESTRICTED':'var(--red)','CONTROLLED':'var(--amber)','OPEN':'var(--accent)'}[CUR.cl];
+  // preview
+  document.getElementById('m-preview-inner').innerHTML=CUR.svg(CUR.accent);
+  const badge=document.getElementById('m-badge');
+  badge.className='m-badge '+{'RESTRICTED':'m-badge-r','CONTROLLED':'m-badge-c','OPEN':'m-badge-o'}[CUR.cl];
+  badge.textContent={'RESTRICTED':'⬛ ACCESS RESTRICTED — DEMO MODE','CONTROLLED':'⬛ CONTROLLED ACCESS — DEMO MODE','OPEN':'⬜ OPEN DEMO — WALKTHROUGH MODE'}[CUR.cl];
+  // dots
+  document.getElementById('m-dots').innerHTML=CUR.steps.map((_,i)=>`<button class="m-dot${i===STEP?' active':''}" onclick="goStep(${i})" title="Step ${i+1}"></button>`).join('');
+  // step
+  document.getElementById('m-icon').textContent=s.icon;
+  document.getElementById('m-counter').textContent=`STEP ${String(STEP+1).padStart(2,'0')} OF ${String(tot).padStart(2,'0')}`;
+  document.getElementById('m-stitle').textContent=s.title;
+  document.getElementById('m-content').textContent=s.body;
+  // nav
+  document.getElementById('nb-prev').disabled=STEP===0;
+  document.getElementById('nb-next').textContent=STEP===tot-1?'CLOSE ✕':'NEXT →';
+  // tech
+  document.getElementById('m-tech').innerHTML=CUR.tech.map(t=>`<span class="tag">${t}</span>`).join('');
+}
+
+/* ── CANVAS BACKGROUND ────────────────────────────────── */
+(()=>{
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,frame=0;
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const G=55;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    frame++;
+    const t=frame*.004;
+    ctx.lineWidth=.5;
+    // vertical
+    for(let x=0;x<W;x+=G){
+      ctx.strokeStyle=`rgba(0,245,192,0.035)`;
+      ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+    }
+    // horizontal
+    for(let y=0;y<H;y+=G){
+      ctx.strokeStyle=`rgba(0,245,192,0.025)`;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    }
+    // animated dots at intersections
+    for(let x=0;x<W;x+=G){
+      for(let y=0;y<H;y+=G){
+        const n=Math.sin(x*.018+t)*Math.cos(y*.018+t*.65);
+        if(n>.55){
+          const a=(n-.55)*0.55;
+          ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);
+          ctx.fillStyle=`rgba(0,245,192,${a})`;ctx.fill();
+        }
+      }
+    }
+    // occasional horizontal scan pulses
+    const py=(Math.sin(t*.3)*.5+.5)*H;
+    const g=ctx.createLinearGradient(0,py-30,0,py+30);
+    g.addColorStop(0,'rgba(0,245,192,0)');
+    g.addColorStop(.5,`rgba(0,245,192,0.04)`);
+    g.addColorStop(1,'rgba(0,245,192,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,py-30,W,60);
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── VERCEL CONFIG ────────────────────────────────────── */
+document.getElementById('vcfg').textContent=`{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
+    }
+  ]
+}`;
+
+/* ── GATE ─────────────────────────────────────────────── */
+// ↓ Change this to your preferred access code
+const ACCESS_CODE = 'TRANSCENDENT';
+
+(function initGate(){
+  const gate  = document.getElementById('gate');
+  const input = document.getElementById('gate-input');
+  const btn   = document.getElementById('gate-btn');
+  const err   = document.getElementById('gate-err');
+
+  // Gate canvas — same grid effect as main bg
+  (function(){
+    const c=document.getElementById('gate-canvas');
+    const ctx=c.getContext('2d');
+    let W,H,f=0;
+    function rsz(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+    rsz();window.addEventListener('resize',rsz);
+    const G=55;
+    function drw(){
+      ctx.clearRect(0,0,W,H);f++;
+      const t=f*.003;ctx.lineWidth=.5;
+      for(let x=0;x<W;x+=G){ctx.strokeStyle='rgba(0,245,192,0.04)';ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(let y=0;y<H;y+=G){ctx.strokeStyle='rgba(0,245,192,0.025)';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+      for(let x=0;x<W;x+=G){for(let y=0;y<H;y+=G){
+        const n=Math.sin(x*.018+t)*Math.cos(y*.018+t*.65);
+        if(n>.58){ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fillStyle=`rgba(0,245,192,${(n-.58)*.5})`;ctx.fill();}
+      }}
+      requestAnimationFrame(drw);
+    }drw();
+  })();
+
+  function showErr(msg){
+    err.textContent='⬛ '+msg;
+    err.classList.remove('hide');
+    input.classList.add('err');
+    setTimeout(()=>input.classList.remove('err'),500);
+    setTimeout(()=>err.classList.add('hide'),3000);
+  }
+
+  function tryUnlock(){
+    const val=input.value.trim().toUpperCase();
+    if(!val){showErr('NO CREDENTIALS ENTERED');return;}
+    if(val===ACCESS_CODE.toUpperCase()){
+      sessionStorage.setItem('d3_access','1');
+      gate.classList.add('unlocking');
+      setTimeout(()=>gate.classList.add('gone'),750);
+    } else {
+      showErr('INVALID CREDENTIALS — ACCESS DENIED');
+      input.value='';
+    }
+  }
+
+  // Already authenticated this session
+  if(sessionStorage.getItem('d3_access')==='1'){
+    gate.classList.add('gone');
+    return;
+  }
+
+  btn.addEventListener('click',tryUnlock);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+  // Focus input on load
+  setTimeout(()=>input.focus(),100);
+})();
+
+/* ── INIT ─────────────────────────────────────────────── */
+renderCards();
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')close_();
+  if(e.key==='ArrowRight'&&CUR)next_();
+  if(e.key==='ArrowLeft'&&CUR)prev_();
+});
+</script>
+</body>
+</html>
